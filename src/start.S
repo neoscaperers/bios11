@@ -7,11 +7,13 @@
 
 _start:
     reset
-    clr @PSW
+    clr @$PSW
     mov $0xa000, sp
-    mov $_timertick, @0100
-    clr @0102
-    mov $0100, @LKS
+    mov $_timertick, @$0100
+    clr @$0102
+    mov $_trap, @$0004
+    mov $003400, @$0006
+    mov $0100, @$LKS
     jsr pc, _main
     halt
 
@@ -19,46 +21,33 @@ _start:
 
     .globl _putc
 _putc:
-    tstb @XSTAT
+    tstb @$XSTAT
     bpl _putc
-    movb 2(sp), @XBUF
+    movb 2(sp), @$XBUF
     rts pc
 
     .globl _timertick
 _timertick:
     mov r0, -(sp)
-    inc @_timer+2
-    adc @_timer
-    swab @_lightdebounce
-    tstb @_lightdebounce
+    inc @$_timer+2
+    adc @$_timer
+    swab @$_lightdebounce
+    tstb @$_lightdebounce
     beq .1
     mov $_lightpattern, r0
-    add @_lightcycle, r0
-    add $2, @_lightcycle
-    mov (r0), @CONS
-    cmp $(PATTERN_LEN*2)-2, @_lightcycle
+    add @$_lightcycle, r0
+    add $2, @$_lightcycle
+    mov (r0), @$CONS
+    cmp $(PATTERN_LEN*2)-2, @$_lightcycle
     bge .1
-    clr @_lightcycle
+    clr @$_lightcycle
 .1:
     mov (sp)+, r0
     rti
 
     .globl _trap
 _trap:
-    mov r5, -(sp)
-    mov r4, -(sp)
-    mov r3, -(sp)
-    mov r2, -(sp)
-    mov r1, -(sp)
-    mov r0, -(sp)
-
-    mov (sp)+, r0
-    mov (sp)+, r1
-    mov (sp)+, r2
-    mov (sp)+, r3
-    mov (sp)+, r4
-    mov (sp)+, r5
-    rti
+    halt
 
     .globl ___main
 ___main:
@@ -101,4 +90,4 @@ _lightpattern:
 _lightcycle:
     .word 0
 _lightdebounce:
-    .byte 1
+    .word 1
