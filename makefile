@@ -3,7 +3,7 @@ OBJCOPY	= pdp11-aout-objcopy
 CFLAGS 	= -nostdlib -ffreestanding -s -Ttext=0x1000 -msoft-float
 SRCS 	= ./src
 TARGET 	= bios11
-FILES	= $(SRCS)/start.s $(SRCS)/main.c $(SRCS)/cons.h
+FILES	= $(SRCS)/crt0.S $(SRCS)/main.c $(SRCS)/cons.h
 OBJS	= $(addsuffix .o, $(basename $(FILES)))
 
 all: $(OBJS)
